@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
-import { Msg } from './types/auth.type';
+import { Jwt, Msg } from './types/auth.type';
 import * as bcrypt from 'bcrypt';
 import {
   PrismaClientKnownRequestError,
@@ -14,7 +14,7 @@ import {
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    // private readonly jwt: JwtService,
+    private readonly jwt: JwtService,
     private readonly config: ConfigService,
   ) {}
   // 新規登録
@@ -40,5 +40,21 @@ export class AuthService {
         }
       }
     }
+  }
+  // Jwtを生成
+  async generateJwt(userId: number, email: string): Promise<Jwt> {
+    const payload = {
+      sub: userId,
+      email,
+    };
+    // 環境変数に定義したシークレットキーを取得
+    const secret = this.config.get('JWT_SECRET');
+    const token = await await this.jwt.signAsync(payload, {
+      expiresIn: '5m',
+      secret: secret,
+    });
+    return {
+      accessToken: token,
+    };
   }
 }
