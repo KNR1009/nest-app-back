@@ -41,15 +41,30 @@ export class AuthService {
       }
     }
   }
-  // Jwtを生成
-  async generateJwt(userId: number, email: string): Promise<Jwt> {
+
+  // ログイン処理が成功した倍にjwtトークンを返す
+  async login(dto: AuthDto): Promise<Jwt> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+    if (!user) throw new ForbiddenException('email or password incorrect');
+    // ハッシュ化されたパスワードとリクエストのパスワードを比較
+    const isValid = await bcrypt.compare(dto.password, user.hashedPassword);
+    if (!isValid) throw new ForbiddenException('email or password incorrect');
+    return this.generateJwt(user.id, user.email);
+  }
+
+  // gwtの生成
+  async generateJwt(userId: number, email): Promise<Jwt> {
     const payload = {
       sub: userId,
-      email,
+      email: email,
     };
-    // 環境変数に定義したシークレットキーを取得
+    // シークレットキーを取得
     const secret = this.config.get('JWT_SECRET');
-    const token = await await this.jwt.signAsync(payload, {
+    const token = await this.jwt.signAsync(payload, {
       expiresIn: '5m',
       secret: secret,
     });
