@@ -32,6 +32,7 @@ export class AuthService {
         message: 'ok',
       };
     } catch (error) {
+      console.log(error);
       // リクエストのemailが重複していた場合
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
