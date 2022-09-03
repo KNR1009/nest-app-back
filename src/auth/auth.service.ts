@@ -42,7 +42,6 @@ export class AuthService {
     }
   }
 
-  // ログイン処理が成功した倍にjwtトークンを返す
   async login(dto: AuthDto): Promise<Jwt> {
     const user = await this.prisma.user.findUnique({
       where: {
