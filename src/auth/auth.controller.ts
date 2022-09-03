@@ -27,7 +27,9 @@ export class AuthController {
     @Body() dto: AuthDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<Msg> {
+    // login処理が成功すればjwtが返ってくる
     const jwt = await this.authService.login(dto);
+    // クッキーにアクセストークンを付与する
     res.cookie('access_token', jwt.accessToken, {
       httpOnly: true,
       secure: false,
@@ -35,7 +37,21 @@ export class AuthController {
       path: '/',
     });
     return {
-      message: 'ok',
+      message: 'success',
+    };
+  }
+  @HttpCode(HttpStatus.OK)
+  @Post('/logout')
+  logout(@Res({ passthrough: true }) res: Response): Msg {
+    // クッキーを削除する
+    res.cookie('access_token', '', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'none',
+      path: '/',
+    });
+    return {
+      message: 'ログアウトしました',
     };
   }
 }
