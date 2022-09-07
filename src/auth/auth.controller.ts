@@ -32,7 +32,7 @@ export class AuthController {
     // クッキーにアクセストークンを付与する
     res.cookie('access_token', jwt.accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: 'none',
       path: '/',
     });
@@ -46,7 +46,7 @@ export class AuthController {
     // クッキーを削除する
     res.cookie('access_token', '', {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: 'none',
       path: '/',
     });
