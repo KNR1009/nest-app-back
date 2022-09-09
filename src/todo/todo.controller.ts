@@ -17,6 +17,7 @@ import { Request } from 'express';
 import { Task } from '@prisma/client';
 import { TodoService } from './todo.service';
 import { CreateTaskDto } from './dto/task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('todo')
@@ -36,5 +37,22 @@ export class TodoController {
   @Post()
   createTask(@Req() req: Request, @Body() dto: CreateTaskDto): Promise<Task> {
     return this.todoService.createTask(req.user.id, dto);
+  }
+  @Patch(':id')
+  updateTaskById(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) taskId: number,
+    @Body() dto: UpdateTaskDto,
+  ): Promise<Task> {
+    return this.todoService.updateTask(req.user.id, taskId, dto);
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete(':id')
+  deleteTaskById(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) taskId: number,
+  ): Promise<void> {
+    return this.todoService.deleteTask(req.user.id, taskId);
   }
 }

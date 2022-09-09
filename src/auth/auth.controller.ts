@@ -46,6 +46,7 @@ export class AuthController {
     // クッキーを削除する
     res.cookie('access_token', '', {
       httpOnly: true,
+      // postmanで確認する場合はfalseにする
       secure: true,
       sameSite: 'none',
       path: '/',
